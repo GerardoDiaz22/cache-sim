@@ -28,8 +28,8 @@ class CacheBlock {
     public:
         CacheBlock(){
             this->isValid = 0;
-            this->tag = -1;
-            this->data = 0;
+            this->tag = 0;
+            this->data = 0xDEADBEEF;
         }
         CacheBlock(int isValid, uint32_t tag, uint32_t data){
             this->isValid = isValid;
@@ -64,24 +64,24 @@ class Memory {
         uint32_t nCacheWords;
         uint32_t nWays;
     public:
-        Memory(uint32_t n, uint32_t m, uint32_t w){
+        Memory(uint32_t cacheSize, uint32_t m, uint32_t ways){
             // Initialize main memory
             mainMemory = MainMemory();
 
             // Check for valid input
-            if (n % 2 != 0 || w % 2 != 0){
-                std::cout << "Failure: number of cache blocks and number of ways of associativity must be powers of 2" << std::endl;
+            if (cacheSize % 2 != 0 || ways % 2 != 0){
+                std::cout << "Failure: cache size and degree of asociativity must be powers of 2" << std::endl;
                 return;
             }
 
             // Initialize cache memory
-            nCacheBlocks = n / w;
+            nCacheBlocks = cacheSize / (4 * ways); // cache size in bytes / (4 bytes per word * ways of asociativity)
             nCacheWords = m;
-            nWays = w;
+            nWays = ways;
             std::vector<CacheBlock> cacheBlocks;
 
             for (uint32_t i = 0; i < nCacheBlocks; i++){
-                for (uint32_t j = 0; j < w; j++){
+                for (uint32_t j = 0; j < ways; j++){
                     cacheBlocks.emplace_back();
                 }
                 cacheMemory.insert(std::make_pair(i,cacheBlocks));
@@ -109,13 +109,13 @@ class Memory {
             for (uint32_t i = 0; i < nCacheBlocks; i++){
                 std::cout << "Block " << i << ": ";
                 for (uint32_t j = 0; j < nWays; j++){
-                    std::cout << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << "data" + std::to_string(cacheMemory.at(i).at(j).getData()) << " ";
+                    std::cout << "Set " << j << ": " << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << cacheMemory.at(i).at(j).getData() << " | ";
                 }
                 std::cout << std::endl;
             }
         }
         uint32_t getNCacheBlocks(){
-            return nCacheBlocks * nWays;
+            return nCacheBlocks;
         }
         uint32_t getNCacheWords(){
             return nCacheWords;
@@ -136,11 +136,11 @@ class Memory {
 
 // TO TEST: ./run.out < addresses.in
 int main (){
-    Memory myMemory(4,1,4); // 2^n cache blocks, 2^m cache words, w ways
+    Memory myMemory(64,1,4); // cache size in bytes, 2^m cache words, w ways
     int number;
     while (std::cin >> number){
         std::cout << myMemory.getData(number) << std::endl;
-        //myMemory.printCache();
     }
+    //myMemory.printCache();
     return 0;
 }
