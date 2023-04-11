@@ -128,14 +128,13 @@ class Memory {
 };
 
 /*  This program tries to simulate the memory hierchy of MIPS32
-    The addresses are 16 bits long, so the memory size is 2^16
+    The addresses are 32 bits long, but the main memory size is 2^16
     Each word is 4 bytes long
     The only user input is the number of cache blocks and the words per block */
 
 // TODO: add the words per block functionality
 // TODO: improve modularity
-// TODO: try to scale to 32 bits
-// TODO: changed the type of all address to 16 bits only, i think is with short int
+// TODO: try to scale up to 32 bit
 // TODO: create an interface to the user
 
 // TO TEST: ./run.out < addresses.in
