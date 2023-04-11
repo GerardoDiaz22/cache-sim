@@ -11,14 +11,12 @@ class MainMemory {
     private:
         std::map<uint32_t,uint32_t> memory;
     public:
-        MainMemory(){
-            for (uint32_t i = 0; i < MEMORY_SIZE; i++) {
-                uint32_t data = i;
-                memory.insert(std::make_pair(i, data));
-            }
-        }
         uint32_t getData(uint32_t address){
-            return memory[address];
+            uint32_t data = address; // This is here if want to change the type of data in the memory
+            if (memory.find(address) == memory.end()){
+                memory.insert(std::make_pair(address, data));
+            }
+            return memory.at(address);
         }
 };
 
@@ -134,7 +132,6 @@ class Memory {
 
 // TODO: add the words per block functionality
 // TODO: improve modularity
-// TODO: try to scale up to 32 bit
 // TODO: create an interface to the user
 
 // TO TEST: ./run.out < addresses.in
