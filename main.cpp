@@ -5,7 +5,7 @@
 #include <cmath>
 #include <cstdint>
 
-const uint32_t MEMORY_SIZE = std::pow(2,16);
+const uint32_t MEMORY_SIZE = std::pow(2,32);
 
 class MainMemory {
     private:
@@ -126,7 +126,7 @@ class Memory {
 };
 
 /*  This program tries to simulate the memory hierchy of MIPS32
-    The addresses are 32 bits long, but the main memory size is 2^16
+    The addresses are 32 bits long, so the memory size is 2^32
     Each word is 4 bytes long
     The only user input is the number of cache blocks and the words per block */
 
