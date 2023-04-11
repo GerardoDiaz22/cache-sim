@@ -3,20 +3,21 @@
 #include <map>
 #include <vector>
 #include <cmath>
+#include <cstdint>
 
-const int MEMORY_SIZE = std::pow(2,16);
+const uint32_t MEMORY_SIZE = std::pow(2,16);
 
 class MainMemory {
     private:
-        std::map<int,std::string> memory;
+        std::map<uint32_t,uint32_t> memory;
     public:
         MainMemory(){
-            for (int i = 0; i < MEMORY_SIZE; i++) {
-                std::string data = "data" + std::to_string(i);
+            for (uint32_t i = 0; i < MEMORY_SIZE; i++) {
+                uint32_t data = i;
                 memory.insert(std::make_pair(i, data));
             }
         }
-        std::string getData(int address){
+        uint32_t getData(uint32_t address){
             return memory[address];
         }
 };
@@ -24,15 +25,15 @@ class MainMemory {
 class CacheBlock {
     private:
         int isValid;
-        int tag;
-        std::string data;
+        uint32_t tag;
+        uint32_t data;
     public:
         CacheBlock(){
             this->isValid = 0;
             this->tag = -1;
-            this->data = "NaN";
+            this->data = 0;
         }
-        CacheBlock(int isValid, int tag, std::string data){
+        CacheBlock(int isValid, uint32_t tag, uint32_t data){
             this->isValid = isValid;
             this->tag = tag;
             this->data = data;
@@ -40,19 +41,19 @@ class CacheBlock {
         int getIsValid(){
             return isValid;
         }
-        int getTag(){
+        uint32_t getTag(){
             return tag;
         }
-        std::string getData(){
+        uint32_t getData(){
             return data;
         }
         void setIsValid(int isValid){
             this->isValid = isValid;
         }
-        void setTag(int tag){
+        void setTag(uint32_t tag){
             this->tag = tag;
         }
-        void setData(std::string data){
+        void setData(uint32_t data){
             this->data = data;
         }
 };
@@ -60,12 +61,12 @@ class CacheBlock {
 class Memory {
     private:
         MainMemory mainMemory;
-        std::map<int,std::vector<CacheBlock>> cacheMemory;
-        int nCacheBlocks;
-        int nCacheWords;
-        int nWays;
+        std::map<uint32_t,std::vector<CacheBlock>> cacheMemory;
+        uint32_t nCacheBlocks;
+        uint32_t nCacheWords;
+        uint32_t nWays;
     public:
-        Memory(int n, int m, int w){
+        Memory(uint32_t n, uint32_t m, uint32_t w){
             // Initialize main memory
             mainMemory = MainMemory();
 
@@ -81,47 +82,47 @@ class Memory {
             nWays = w;
             std::vector<CacheBlock> cacheBlocks;
 
-            for (int i = 0; i < nCacheBlocks; i++){
-                for (int j = 0; j < w; j++){
+            for (uint32_t i = 0; i < nCacheBlocks; i++){
+                for (uint32_t j = 0; j < w; j++){
                     cacheBlocks.emplace_back();
                 }
                 cacheMemory.insert(std::make_pair(i,cacheBlocks));
             }
         }
-        std::string getData(int address){
+        std::string getData(uint32_t address){
             if (address < 0 || address >= MEMORY_SIZE){
                 return "Failure: Address out of bounds";
             }
-            int index = address % nCacheBlocks;
-            int tag = address / nCacheBlocks;
-            for (int i = 0; i < nWays; i++){
+            uint32_t index = address % nCacheBlocks;
+            uint32_t tag = address / nCacheBlocks;
+            for (uint32_t i = 0; i < nWays; i++){
                 if (cacheMemory.at(index).at(i).getIsValid() == 1 && cacheMemory.at(index).at(i).getTag() == tag){
                     cacheMemory.at(index).push_back(cacheMemory.at(index).at(i));
                     cacheMemory.at(index).erase(cacheMemory.at(index).begin() + i);
-                    return cacheMemory.at(index).back().getData();
+                    return "data" + std::to_string(cacheMemory.at(index).back().getData());
                 }
             }
-            std::string data = mainMemory.getData(address);
+            uint32_t data = mainMemory.getData(address);
             cacheMemory.at(index).erase(cacheMemory.at(index).begin());
             cacheMemory.at(index).emplace_back(1,tag,data);
             return "Failure: Cache miss";
         }
         void printCache(){
-            for (int i = 0; i < nCacheBlocks; i++){
+            for (uint32_t i = 0; i < nCacheBlocks; i++){
                 std::cout << "Block " << i << ": ";
-                for (int j = 0; j < nWays; j++){
-                    std::cout << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << cacheMemory.at(i).at(j).getData() << " ";
+                for (uint32_t j = 0; j < nWays; j++){
+                    std::cout << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << "data" + std::to_string(cacheMemory.at(i).at(j).getData()) << " ";
                 }
                 std::cout << std::endl;
             }
         }
-        int getNCacheBlocks(){
+        uint32_t getNCacheBlocks(){
             return nCacheBlocks * nWays;
         }
-        int getNCacheWords(){
+        uint32_t getNCacheWords(){
             return nCacheWords;
         }
-        int getNWays(){
+        uint32_t getNWays(){
             return nWays;
         }
 };
