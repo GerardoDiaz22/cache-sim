@@ -125,7 +125,7 @@ class Memory {
         }
 };
 
-/*  This program tries to simulate the memory hierchy of MIPS32
+/*  This program simulates the memory hierchy of MIPS32
     The addresses are 32 bits long, so the memory size is 2^32
     Each word is 4 bytes long
     The only user input is the number of cache blocks and the words per block */
