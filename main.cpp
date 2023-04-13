@@ -69,7 +69,7 @@ class Memory {
             mainMemory = MainMemory();
 
             // Check for valid input
-            if (cacheSize % 2 != 0 || ways % 2 != 0){
+            if (cacheSize % 2 != 0 || (ways % 2 != 0 && ways != 1)){ // this is wrong
                 std::cout << "Failure: cache size and degree of asociativity must be powers of 2" << std::endl;
                 return;
             }
@@ -85,6 +85,7 @@ class Memory {
                     cacheBlocks.emplace_back();
                 }
                 cacheMemory.insert(std::make_pair(i,cacheBlocks));
+                cacheBlocks.clear(); // Clear the cacheBlocks vector to reuse it
             }
         }
         std::string getData(uint32_t address){
@@ -109,7 +110,7 @@ class Memory {
             for (uint32_t i = 0; i < nCacheBlocks; i++){
                 std::cout << "Block " << i << ": ";
                 for (uint32_t j = 0; j < nWays; j++){
-                    std::cout << "Set " << j << ": " << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << cacheMemory.at(i).at(j).getData() << " | ";
+                    std::cout << " | " << "Set " << j << ": " << cacheMemory.at(i).at(j).getIsValid() << " " << cacheMemory.at(i).at(j).getTag() << " " << cacheMemory.at(i).at(j).getData() << " | ";
                 }
                 std::cout << std::endl;
             }
@@ -135,12 +136,27 @@ class Memory {
 // TODO: create an interface to the user
 
 // TO TEST: ./run.out < addresses.in
+// NOTE: NO LE PARES BOLA A MAIN LO DEJE ASI PARA QUE VEAS Q SIRVE AUGUSTO!!!
 int main (){
-    Memory myMemory(64,1,4); // cache size in bytes, 2^m cache words, w ways
     int number;
+    std::vector<int> testArr = {0,8,0,6,8}; 
+    std::cout << "Correspondencia Directa" << std::endl;
+    Memory myMemory(16,1,1); // cache size in bytes, 2^m cache words, w ways
     while (std::cin >> number){
+        //myMemory.printCache();
         std::cout << myMemory.getData(number) << std::endl;
     }
-    //myMemory.printCache();
+    std::cout << std::endl << "Asociativa por Conjuntos m=2" << std::endl;
+    Memory myMemory2(16,1,2); // cache size in bytes, 2^m cache words, w ways
+    for (int i = 0; i < 5; i++){
+        //myMemory2.printCache();
+        std::cout << myMemory2.getData(testArr[i]) << std::endl;
+    }
+    std::cout << std::endl << "Completamente Asociativa" << std::endl;
+    Memory myMemory3(16,1,4); // cache size in bytes, 2^m cache words, w ways
+    for (int i = 0; i < 5; i++){
+        //myMemory3.printCache();
+        std::cout << myMemory3.getData(testArr[i]) << std::endl;
+    }
     return 0;
 }
